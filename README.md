@@ -54,7 +54,7 @@ The system is built on a **Three-Tier Architecture**, ensuring specialized acces
 
 1. **Clone the repository**
 ```bash
-https://github.com/your-username/office-management-system.git](https://github.com/paperless-office/pos.git
+https://github.com/paperless-office/pos.git
 
 ```
 
