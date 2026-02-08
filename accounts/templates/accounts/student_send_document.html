@@ -1,0 +1,21 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Send Document to Teacher{% endblock %}
+
+{% block content %}
+<h2>Send Document to Teacher</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <label>Choose File:</label><br>
+    {{ form.file }} <br><br>
+
+    <label>Select Teacher:</label><br>
+    {{ form.teacher }} <br><br>
+
+    <button type="submit">Send Document</button>
+</form>
+
+<a href="{% url 'student_documents' %}">⬅ Back</a>
+{% endblock %}

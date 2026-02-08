@@ -1,0 +1,59 @@
+{% extends 'accounts/base_dashboard.html' %}
+
+{% block dash %}
+<div class="dash">
+  <div class="project">Teacher Dashboard</div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="action-grid">
+    <a href="{% url 'teacher_documents' %}" class="action-btn">
+        <i class="fa-solid fa-folder-open"></i>
+        <span>Documents</span>
+    </a>
+
+    <a href="{% url 'send_report' %}" class="action-btn">
+        <i class="fa-solid fa-file-export"></i>
+        <span>Send Report</span>
+    </a>
+
+    <a href="{% url 'teacher_notice_create' %}" class="action-btn">
+        <i class="fa-solid fa-plus-circle"></i>
+        <span>Create Notice</span>
+    </a>
+
+    <a href="{% url 'teacher_class_routine' %}" class="action-btn">
+        <i class="fa-solid fa-calendar-check"></i>
+        <span>Class Routine</span>
+    </a>
+
+    <a href="{% url 'teacher_assignments' %}" class="action-btn">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>Student Assignments</span>
+    </a>
+</div>
+
+{% endblock %}
+
+{% block notice%}
+<div>
+    <div class="notice-board">
+        <h2><i class="fa-solid fa-bullhorn"></i> Notice Board</h2>
+
+        {% for notice in notices|slice:":2" %}
+        <div class="notice">
+            <strong>{{ notice.title }}</strong>
+            <p>{{ notice.description }}</p>
+            <small>
+                <i class="fa-regular fa-clock"></i> {{ notice.created_at|date:"M d, Y h:i A" }}
+                &nbsp;•&nbsp; <i class="fa-solid fa-user"></i> {{ notice.created_by.username }}
+            </small>
+        </div>
+        {% empty %}
+        <p style="color: #94a3b8; font-style: italic;">No new notices at this time.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

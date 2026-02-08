@@ -1,0 +1,255 @@
+{% extends 'accounts/base_dashboard.html' %}
+
+{% block title %}All Notices{% endblock %}
+
+{% block dash %}
+{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* --- FORCE DARK THEME --- */
+    body {
+        background-color: #0f172a !important; /* Deep Slate */
+        color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+    }
+
+    /* --- Page Layout --- */
+    .page-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    /* --- Header --- */
+    .page-header {
+        margin-bottom: 2.5rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    /* --- Notice Feed --- */
+    .notice-feed {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    /* --- Notice Card --- */
+    .notice-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .notice-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.4);
+        border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    /* Accent Border (Dynamic based on type) */
+    .notice-card.dept-notice::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: linear-gradient(180deg, #3b82f6, #6366f1); /* Blue/Purple */
+    }
+
+    .notice-card.teacher-notice::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: linear-gradient(180deg, #f59e0b, #f97316); /* Orange/Amber */
+    }
+
+    /* Card Content */
+    .card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .notice-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .notice-date {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+        margin-left: 15px;
+    }
+
+    .notice-desc {
+        font-size: 1rem;
+        color: #cbd5e1;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Footer / Badges */
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .notice-badge {
+        font-size: 0.8rem;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-dept {
+        background: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .badge-teacher {
+        background: rgba(245, 158, 11, 0.15);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .author-info {
+        font-size: 0.85rem;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        color: #64748b;
+        border: 2px dashed #334155;
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.5);
+    }
+
+    /* Back Button */
+    .btn-back-float {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #1e293b;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        z-index: 100;
+    }
+    .btn-back-float:hover { background: #3b82f6; border-color: #3b82f6; }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="page-container">
+    
+    <div class="page-header">
+        <div class="page-title">
+            <i class="fa-solid fa-bell"></i> Notice Board
+        </div>
+    </div>
+
+    <div class="notice-feed">
+        {% for notice in notices %}
+            <div class="notice-card {% if notice.notice_type == 'department' %}dept-notice{% else %}teacher-notice{% endif %}">
+                
+                <div class="card-top">
+                    <h3 class="notice-title">{{ notice.title }}</h3>
+                    <div class="notice-date">
+                        <i class="fa-regular fa-clock"></i> {{ notice.created_at|date:"M d, Y • h:i A" }}
+                    </div>
+                </div>
+
+                <div class="notice-desc">
+                    {{ notice.description }}
+                </div>
+
+                <div class="card-footer">
+                    {% if notice.notice_type == 'department' %}
+                        <span class="notice-badge badge-dept">
+                            <i class="fa-solid fa-building-columns"></i> Department Notice
+                        </span>
+                    {% else %}
+                        <span class="notice-badge badge-teacher">
+                            <i class="fa-solid fa-chalkboard-user"></i> Teacher Notice
+                        </span>
+                    {% endif %}
+
+                    <div class="author-info">
+                        <i class="fa-solid fa-user-pen"></i> Posted by {{ notice.created_by.username }}
+                    </div>
+                </div>
+
+            </div>
+        {% empty %}
+            <div class="empty-state">
+                <i class="fa-regular fa-clipboard" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <p>No notices have been posted yet.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<a href="{% url 'student-dashboard' %}" class="btn-back-float">
+    <i class="fa-solid fa-arrow-left"></i> Dashboard
+</a>
+
+{% endblock %}

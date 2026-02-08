@@ -1,0 +1,247 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Teachers Directory{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* --- Base Settings --- */
+    body {
+        background-color: #0f172a; /* Deep Slate Background */
+        font-family: 'Inter', sans-serif;
+        color: #f8fafc;
+        margin: 0;
+        overflow-x: hidden;
+    }
+
+    /* --- Animations --- */
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Page Layout --- */
+    .page-container {
+        display: flex;
+        justify-content: center;
+        padding: 3rem 1.5rem;
+        min-height: 90vh;
+    }
+
+    /* --- The Glass Card --- */
+    .directory-card {
+        width: 100%;
+        max-width: 900px;
+        background: rgba(30, 41, 59, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        animation: slideUp 0.6s ease-out;
+        position: relative;
+    }
+
+    /* Top Accent Line */
+    .directory-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #6366f1);
+    }
+
+    /* --- Header Section --- */
+    .card-header {
+        padding: 2rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #fff;
+    }
+
+    .badge-count {
+        background: rgba(59, 130, 246, 0.2);
+        color: #60a5fa;
+        font-size: 0.8rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    /* --- Table Styling --- */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .formal-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+
+    .formal-table th {
+        background: rgba(15, 23, 42, 0.5);
+        color: #94a3b8;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.05em;
+        padding: 1.2rem 2rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .formal-table td {
+        padding: 1.2rem 2rem;
+        color: #cbd5e1;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        transition: background 0.2s;
+        font-size: 0.95rem;
+    }
+
+    .formal-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .formal-table tr:hover td {
+        background: rgba(59, 130, 246, 0.05);
+        color: #fff;
+    }
+
+    /* User Profile Cell Styling */
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 600;
+        font-size: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+    }
+
+    .email-link {
+        color: #94a3b8;
+        text-decoration: none;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .email-link:hover { color: #3b82f6; }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #64748b;
+    }
+
+    /* Back Button */
+    .btn-back-float {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #1e293b;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        z-index: 50;
+    }
+    .btn-back-float:hover {
+        background: #3b82f6;
+        border-color: #3b82f6;
+    }
+</style>
+
+<div class="page-container">
+    <div class="directory-card">
+        
+        <div class="card-header">
+            <h2>
+                <i class="fa-solid fa-chalkboard-user" style="color: #3b82f6;"></i>
+                Teachers Directory
+            </h2>
+            {% if teachers %}
+                <span class="badge-count">{{ teachers|length }} Staff Members</span>
+            {% endif %}
+        </div>
+
+        {% if teachers %}
+            <div class="table-responsive">
+                <table class="formal-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%;">Name / Profile</th>
+                            <th>Email Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for teacher in teachers %}
+                        <tr>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="avatar-placeholder">
+                                        {{ teacher.username|slice:":1"|upper }}
+                                    </div>
+                                    <span style="font-weight: 500;">{{ teacher.username }}</span>
+                                </div>
+                            </td>
+                            
+                            <td>
+                                <a href="mailto:{{ teacher.email }}" class="email-link">
+                                    <i class="fa-regular fa-envelope"></i> {{ teacher.email }}
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fa-solid fa-user-slash" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                <p>No teachers found in the department directory.</p>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<a href="{% url 'dept-dashboard' %}" class="btn-back-float">
+    <i class="fa-solid fa-arrow-left"></i> Dashboard
+</a>
+
+{% endblock %}

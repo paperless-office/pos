@@ -1,0 +1,249 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}My Documents{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* --- FORCE DARK THEME --- */
+    body {
+        background-color: #0f172a !important; /* Deep Slate */
+        color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+    }
+
+    /* --- Page Layout --- */
+    .page-container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem;
+    }
+
+    /* --- Header --- */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #fff;
+    }
+
+    /* Primary Action Button (Send) */
+    .btn-primary-action {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+    }
+
+    /* --- Document Grid --- */
+    .doc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        animation: fadeIn 0.6s ease-out;
+    }
+
+    /* --- Document Card --- */
+    .doc-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s, border-color 0.3s;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .doc-card:hover {
+        transform: translateY(-5px);
+        border-color: #3b82f6;
+        background: rgba(30, 41, 59, 0.9);
+    }
+
+    .doc-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: linear-gradient(180deg, #3b82f6, #6366f1);
+    }
+
+    /* Card Content */
+    .doc-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 1rem;
+    }
+
+    .file-icon {
+        width: 45px;
+        height: 45px;
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .doc-info h4 { margin: 0; font-size: 1rem; color: #fff; font-weight: 600; line-height: 1.4; }
+    .doc-email { font-size: 0.85rem; color: #94a3b8; display: block; margin-top: 4px; }
+
+    .doc-meta {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255,255,255,0.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    /* Download Button */
+    .btn-download {
+        background: rgba(15, 23, 42, 0.6);
+        color: #cbd5e1;
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        border: 1px solid #334155;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-download:hover {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        color: #64748b;
+        border: 2px dashed #334155;
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.5);
+    }
+
+    /* Back Button */
+    .btn-back-float {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #1e293b;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        z-index: 100;
+    }
+    .btn-back-float:hover { background: #3b82f6; border-color: #3b82f6; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="page-container">
+    
+    <div class="page-header">
+        <div class="page-title">
+            <i class="fa-solid fa-folder-open"></i> My Documents
+        </div>
+
+        <a href="{% url 'student_send_document' %}" class="btn-primary-action">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Send Document to Teacher
+        </a>
+    </div>
+
+    {% if documents %}
+        <div class="doc-grid">
+            {% for doc in documents %}
+            <div class="doc-card">
+                
+                <div class="doc-header">
+                    <div class="file-icon">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    <div class="doc-info">
+                        <h4>{{ doc.sender.username }}</h4>
+                        <span class="doc-email">{{ doc.sender.get_full_name|default:doc.sender.email }}</span>
+                    </div>
+                </div>
+
+                <div class="doc-meta">
+                    <span>
+                        <i class="fa-regular fa-clock"></i> {{ doc.created_at|date:"M d, Y" }}
+                    </span>
+                    
+                    <a href="{{ doc.file.url }}" target="_blank" class="btn-download">
+                        <i class="fa-solid fa-download"></i> Download
+                    </a>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fa-regular fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <p>No documents found in your archive.</p>
+        </div>
+    {% endif %}
+
+</div>
+
+<a href="{% url 'student-dashboard' %}" class="btn-back-float">
+    <i class="fa-solid fa-arrow-left"></i> Dashboard
+</a>
+
+{% endblock %}

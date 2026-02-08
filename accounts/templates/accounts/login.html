@@ -1,0 +1,17 @@
+{% extends 'accounts/auth_base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<h2>Welcome Back</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Login</button>
+</form>
+
+<div class="link">
+    <a href="{% url 'signup' %}">Create new account</a>
+</div>
+{% endblock %}

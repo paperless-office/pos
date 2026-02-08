@@ -1,0 +1,301 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Assignment Submission{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* --- FORCE DARK THEME --- */
+    body {
+        background-color: #0f172a !important; /* Deep Slate */
+        color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* --- Animations --- */
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Page Container --- */
+    .page-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 85vh;
+        padding: 2rem;
+    }
+
+    /* --- The Formal Split Card --- */
+    .submission-card {
+        display: flex;
+        width: 100%;
+        max-width: 900px;
+        background: rgba(30, 41, 59, 0.85); /* Solid Dark Slate */
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        overflow: hidden;
+        animation: slideUp 0.6s ease-out;
+        position: relative;
+    }
+
+    /* Top Accent Line */
+    .submission-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #06b6d4);
+        z-index: 10;
+    }
+
+    /* --- LEFT PANEL: Info & Guidelines --- */
+    .card-left {
+        flex: 1;
+        background: rgba(15, 23, 42, 0.6);
+        padding: 3rem;
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .info-header {
+        margin-bottom: 2rem;
+    }
+
+    .info-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .info-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+    }
+
+    .info-subtitle {
+        color: #94a3b8;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .guidelines {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .guide-item {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 1rem;
+        align-items: flex-start;
+    }
+
+    .guide-item i {
+        color: #10b981; /* Success Green */
+        margin-top: 3px;
+    }
+
+    .guide-text {
+        font-size: 0.85rem;
+        color: #cbd5e1;
+    }
+
+    /* --- RIGHT PANEL: The Form --- */
+    .card-right {
+        flex: 1.2;
+        padding: 3rem;
+        background: rgba(30, 41, 59, 0.4);
+    }
+
+    .form-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 1.5rem;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* Form Field Styling */
+    .formal-form p {
+        margin-bottom: 1.5rem;
+    }
+
+    .formal-form label {
+        display: block;
+        margin-bottom: 0.6rem;
+        color: #94a3b8;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .formal-form input[type="text"],
+    .formal-form input[type="number"],
+    .formal-form select,
+    .formal-form textarea {
+        width: 100%;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        padding: 0.8rem 1rem;
+        color: #fff;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .formal-form input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    /* Special Styling for File Input to look like a drop zone */
+    .formal-form input[type="file"] {
+        width: 100%;
+        padding: 2rem;
+        background: rgba(59, 130, 246, 0.05);
+        border: 2px dashed #334155;
+        border-radius: 8px;
+        text-align: center;
+        color: #cbd5e1;
+        cursor: pointer;
+        transition: border-color 0.2s;
+    }
+    
+    .formal-form input[type="file"]:hover {
+        border-color: #3b82f6;
+        background: rgba(59, 130, 246, 0.1);
+    }
+
+    /* Submit Button */
+    .btn-submit {
+        width: 100%;
+        padding: 1rem;
+        margin-top: 1rem;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Back Button */
+    .btn-back-float {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #1e293b;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        z-index: 100;
+    }
+    .btn-back-float:hover { background: #3b82f6; border-color: #3b82f6; }
+
+    /* Mobile Responsive */
+    @media (max-width: 850px) {
+        .submission-card { flex-direction: column; max-width: 500px; }
+        .card-left { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 2rem; }
+        .card-right { padding: 2rem; }
+    }
+
+</style>
+
+<div class="page-container">
+    <div class="submission-card">
+        
+        <div class="card-left">
+            <div class="info-header">
+                <div class="info-icon">
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                </div>
+                <h2 class="info-title">Submit Assignment</h2>
+                <p class="info-subtitle">Ensure your work is finalized before uploading. Once submitted, it will be sent directly to the department portal.</p>
+            </div>
+
+            <div class="guidelines">
+                <div class="guide-item">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span class="guide-text">File format: PDF or ZIP is recommended.</span>
+                </div>
+                <div class="guide-item">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span class="guide-text">Ensure your file includes your name/ID.</span>
+                </div>
+                <div class="guide-item">
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span class="guide-text">Max file size limit: 10MB.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-right">
+            <div class="form-title">Submission Details</div>
+            
+            <form method="post" enctype="multipart/form-data" class="formal-form">
+                {% csrf_token %}
+                
+                {{ form.as_p }}
+
+                <button type="submit" class="btn-submit">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload Now
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<a href="{% url 'student-dashboard' %}" class="btn-back-float">
+    <i class="fa-solid fa-arrow-left"></i> Dashboard
+</a>
+
+{% endblock %}

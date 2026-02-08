@@ -1,0 +1,245 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Update Profile Picture{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* --- Base Settings --- */
+    body {
+        background-color: #0f172a;
+        font-family: 'Inter', sans-serif;
+        color: #f8fafc;
+        margin: 0;
+        overflow-x: hidden;
+    }
+
+    /* --- Animations --- */
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes softGlow {
+        0% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.1); }
+        50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.3); }
+        100% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.1); }
+    }
+
+    /* --- Layout Container --- */
+    .profile-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 85vh;
+        padding: 2rem;
+    }
+
+    /* --- Wide Formal Card --- */
+    .formal-card {
+        background: rgba(30, 41, 59, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        width: 100%;
+        max-width: 850px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+        animation: slideUp 0.7s ease-out forwards;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: row; /* Side-by-Side Layout */
+    }
+
+    .formal-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        z-index: 2;
+    }
+
+    /* --- Left Section (Current Image) --- */
+    .card-left {
+        flex: 1;
+        background: rgba(15, 23, 42, 0.5);
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-right: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .current-img-wrapper {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        padding: 6px;
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        margin-bottom: 1.5rem;
+        animation: softGlow 3s infinite;
+    }
+
+    .current-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 4px solid #0f172a;
+    }
+
+    .card-left h3 { margin: 0; font-size: 1.2rem; color: #fff; }
+    .card-left p { color: #94a3b8; font-size: 0.9rem; margin-top: 0.5rem; }
+
+    /* --- Right Section (Form) --- */
+    .card-right {
+        flex: 1.2;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .card-right h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #f1f5f9;
+    }
+
+    .card-right .desc {
+        color: #64748b;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    /* --- THE FIX: Hiding Django's "Currently" text --- */
+    .django-field-fix {
+        background: #0f172a;
+        border: 2px dashed #334155;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: border-color 0.3s;
+        margin-bottom: 2rem;
+        
+        /* This hides the "Currently: /path/to/file" text */
+        font-size: 0; 
+    }
+
+    .django-field-fix:hover {
+        border-color: #3b82f6;
+        background: rgba(15, 23, 42, 0.8);
+    }
+
+    /* Hide the "Currently" anchor link */
+    .django-field-fix a { display: none !important; }
+    
+    /* Hide the "Clear" checkbox and label */
+    .django-field-fix input[type="checkbox"] { display: none !important; }
+    .django-field-fix label { display: none !important; }
+
+    /* Style the actual File Input button */
+    .django-field-fix input[type="file"] {
+        font-size: 1rem; /* Restore font size */
+        color: #cbd5e1;
+        width: 100%;
+        cursor: pointer;
+        display: block;
+    }
+
+    /* Submit Button */
+    .btn-update {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .btn-update:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Back Button */
+    .btn-back {
+        position: absolute;
+        top: 2rem;
+        left: 2rem;
+        text-decoration: none;
+        color: #94a3b8;
+        background: rgba(30, 41, 59, 0.8);
+        padding: 0.7rem 1.2rem;
+        border-radius: 30px;
+        border: 1px solid rgba(255,255,255,0.05);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        z-index: 10;
+        font-size: 0.9rem;
+    }
+    .btn-back:hover { background: #1e293b; color: #fff; border-color: #3b82f6; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+        .formal-card { flex-direction: column; max-width: 500px; }
+        .card-left { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 2rem; }
+    }
+</style>
+
+<a href="{% url 'redirect-dashboard' %}" class="btn-back">
+    <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+</a>
+
+<div class="profile-container">
+    <div class="formal-card">
+        
+        <div class="card-left">
+            <div class="current-img-wrapper">
+                <img src="{{ request.user.profile_image.url }}" alt="Current Profile">
+            </div>
+            <h3>Current Picture</h3>
+            <p>Visible to all staff</p>
+        </div>
+
+        <div class="card-right">
+            <h2>Update Picture</h2>
+            <p class="desc">Select a new professional photo to update your identity.</p>
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="django-field-fix">
+                    <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2rem; color: #3b82f6; margin-bottom: 1rem; display:block;"></i>
+                    
+                    {{ form.profile_image }}
+                </div>
+
+                <button type="submit" class="btn-update">
+                    <i class="fa-solid fa-check"></i> Save Changes
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

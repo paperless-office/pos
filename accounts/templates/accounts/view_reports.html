@@ -1,0 +1,271 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* --- FORCE DARK THEME --- */
+    body {
+        background-color: #0f172a !important; /* Deep Slate */
+        color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+    }
+
+    /* --- Page Layout --- */
+    .page-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 3rem 1rem;
+    }
+
+    /* --- Section Title --- */
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #fff;
+    }
+
+    /* --- Glass Card Style (Matching your Profile Theme) --- */
+    .report-card {
+        background: rgba(30, 41, 59, 0.7); /* See-through Dark */
+        backdrop-filter: blur(12px);      /* Blur Effect */
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 0;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .report-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+        border-color: rgba(59, 130, 246, 0.4);
+    }
+
+    /* Gradient Top Border */
+    .report-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 3px;
+        background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    }
+
+    /* --- Header: Sender Info --- */
+    .card-header {
+        padding: 1.5rem;
+        background: rgba(15, 23, 42, 0.4);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .avatar-circle {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: white;
+        border: 2px solid rgba(255,255,255,0.1);
+        box-shadow: 0 0 15px rgba(37, 99, 235, 0.3);
+    }
+
+    .user-info h4 { margin: 0; font-size: 1.05rem; font-weight: 600; color: #fff; }
+    .user-role { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+
+    .meta-date { font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 6px; }
+
+    /* --- Body: Message --- */
+    .card-body {
+        padding: 1.5rem;
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #cbd5e1;
+    }
+
+    .quote-icon { color: #334155; font-size: 1.2rem; margin-right: 8px; }
+
+    /* --- Footer: Feedback Section --- */
+    .card-footer {
+        padding: 1.5rem;
+        background: rgba(0, 0, 0, 0.2);
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Status: Resolved */
+    .feedback-box {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .feedback-title { color: #34d399; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.5rem; display: block; text-transform: uppercase; }
+    .feedback-content { color: #e2e8f0; font-size: 0.95rem; }
+
+    /* Form: Input Area */
+    .response-area {
+        width: 100%;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 1rem;
+        color: white;
+        font-family: 'Inter', sans-serif;
+        resize: vertical;
+        min-height: 100px;
+        transition: all 0.3s;
+        box-sizing: border-box; /* Fixes width overflow */
+    }
+
+    .response-area:focus {
+        outline: none;
+        border-color: #3b82f6;
+        background: #151e32;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Button */
+    .btn-submit {
+        margin-top: 1rem;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-submit:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        color: #64748b;
+        border: 2px dashed #334155;
+        border-radius: 16px;
+    }
+
+    /* Back Button */
+    .btn-back-float {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #1e293b;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        z-index: 100;
+    }
+    .btn-back-float:hover { background: #3b82f6; border-color: #3b82f6; }
+
+</style>
+
+<div class="page-container">
+    
+    <div class="page-title">
+        <i class="fa-solid fa-inbox"></i> Incoming Reports
+    </div>
+
+    {% for report in reports %}
+    <div class="report-card">
+        
+        <div class="card-header">
+            <div class="user-profile">
+                <div class="avatar-circle">
+                    {{ report.sender.username|slice:":1"|upper }}
+                </div>
+                <div class="user-info">
+                    <h4>{{ report.sender.username }}</h4>
+                    <span class="user-role">{{ report.sender_type }}</span>
+                </div>
+            </div>
+            <div class="meta-date">
+                <i class="fa-regular fa-clock"></i> {{ report.created_at|date:"M d, h:i A" }}
+            </div>
+        </div>
+
+        <div class="card-body">
+            <i class="fa-solid fa-quote-left quote-icon"></i>
+            {{ report.message }}
+        </div>
+
+        <div class="card-footer">
+            {% if report.is_responded %}
+                <div class="feedback-box">
+                    <span class="feedback-title">
+                        <i class="fa-solid fa-circle-check"></i> Response Sent
+                    </span>
+                    <div class="feedback-content">
+                        {{ report.feedback }}
+                    </div>
+                </div>
+            {% else %}
+                <form method="post" action="{% url 'respond_report' report.id %}">
+                    {% csrf_token %}
+                    <textarea name="feedback" class="response-area" placeholder="Type your formal response here..." required></textarea>
+                    
+                    <button type="submit" class="btn-submit">
+                        <i class="fa-solid fa-paper-plane"></i> Send Response
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+
+    </div>
+    {% empty %}
+        <div class="empty-state">
+            <i class="fa-solid fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <p>No new reports to display.</p>
+        </div>
+    {% endfor %}
+
+</div>
+
+<a href="{% url 'dept-dashboard' %}" class="btn-back-float">
+    <i class="fa-solid fa-arrow-left"></i> Dashboard
+</a>
+
+{% endblock %}

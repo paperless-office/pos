@@ -1,0 +1,310 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %}Class Routine Manager{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* --- Base Settings --- */
+    body {
+        background-color: #0f172a; /* Deep Slate Background */
+        font-family: 'Inter', sans-serif;
+        color: #f8fafc;
+        margin: 0;
+        overflow-x: hidden;
+    }
+
+    /* --- Animations --- */
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Layout Container --- */
+    .page-container {
+        display: flex;
+        justify-content: center;
+        padding: 3rem 1.5rem;
+        min-height: 90vh;
+    }
+
+    /* --- The Glass Card --- */
+    .routine-card {
+        width: 100%;
+        max-width: 1000px;
+        background: rgba(30, 41, 59, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+        animation: slideUp 0.6s ease-out;
+        position: relative;
+    }
+
+    .routine-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #10b981);
+    }
+
+    /* --- Header --- */
+    .card-header {
+        padding: 2rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    /* --- List Layout (Replacing Table) --- */
+    .routine-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Header Row */
+    .list-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.5fr; /* Columns: Semester | Status | Action */
+        padding: 1rem 2rem;
+        background: rgba(15, 23, 42, 0.5);
+        color: #94a3b8;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Data Row */
+    .list-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1.5fr;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        align-items: center;
+        transition: background 0.2s;
+    }
+
+    .list-row:last-child { border-bottom: none; }
+    .list-row:hover { background: rgba(59, 130, 246, 0.05); }
+
+    /* --- Column Styling --- */
+    .col-semester {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .semester-icon {
+        width: 35px;
+        height: 35px;
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition: transform 0.2s;
+    }
+
+    .status-view {
+        background: rgba(16, 185, 129, 0.15);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .status-view:hover { transform: translateY(-2px); background: rgba(16, 185, 129, 0.25); }
+
+    .status-missing {
+        background: rgba(148, 163, 184, 0.1);
+        color: #94a3b8;
+        border: 1px dashed #475569;
+        cursor: default;
+    }
+
+    /* Action Form Styling */
+    .upload-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .file-input-wrapper {
+        flex: 1;
+    }
+
+    .file-input-wrapper input[type="file"] {
+        width: 100%;
+        font-size: 0.8rem;
+        color: #cbd5e1;
+        background: #0f172a;
+        padding: 0.5rem;
+        border: 1px solid #334155;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .btn-action {
+        padding: 0.6rem 1rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .btn-upload {
+        background: #3b82f6;
+        color: white;
+    }
+    .btn-upload:hover { background: #2563eb; }
+
+    .btn-update {
+        background: #f59e0b; /* Amber for update */
+        color: white;
+    }
+    .btn-update:hover { background: #d97706; }
+
+    /* Back Button */
+    .btn-back-float {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #1e293b;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        z-index: 50;
+    }
+    .btn-back-float:hover { background: #3b82f6; border-color: #3b82f6; }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .list-header { display: none; } /* Hide header on mobile */
+        
+        .list-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .col-semester { justify-content: center; margin-bottom: 0.5rem; }
+        .upload-form { flex-direction: column; width: 100%; }
+        .btn-action { width: 100%; justify-content: center; }
+    }
+</style>
+
+<div class="page-container">
+    <div class="routine-card">
+        
+        <div class="card-header">
+            <h2>
+                <i class="fa-solid fa-calendar-days" style="color: #3b82f6;"></i>
+                Class Routine Manager
+            </h2>
+        </div>
+
+        <div class="routine-list">
+            
+            <div class="list-header">
+                <div>Semester Level</div>
+                <div>Current File</div>
+                <div>Update Action</div>
+            </div>
+
+            {% for semester, routine in routines.items %}
+            <div class="list-row">
+                
+                <div class="col-semester">
+                    <div class="semester-icon">{{ semester }}</div>
+                    Semester {{ semester }}
+                </div>
+
+                <div class="col-status">
+                    {% if routine %}
+                        <a href="{{ routine.file.url }}" target="_blank" class="status-badge status-view">
+                            <i class="fa-solid fa-file-pdf"></i> View Routine
+                        </a>
+                    {% else %}
+                        <span class="status-badge status-missing">
+                            <i class="fa-solid fa-circle-xmark"></i> Not uploaded
+                        </span>
+                    {% endif %}
+                </div>
+
+                <div class="col-action">
+                    <form method="post" enctype="multipart/form-data" class="upload-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="semester" value="{{ semester }}">
+                        
+                        <div class="file-input-wrapper">
+                            <input type="file" name="file" required>
+                        </div>
+
+                        <button type="submit" class="btn-action {% if routine %}btn-update{% else %}btn-upload{% endif %}">
+                            {% if routine %}
+                                <i class="fa-solid fa-rotate"></i> Update
+                            {% else %}
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Upload
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+
+<a href="{% url 'dept-dashboard' %}" class="btn-back-float">
+    <i class="fa-solid fa-arrow-left"></i> Dashboard
+</a>
+
+{% endblock %}

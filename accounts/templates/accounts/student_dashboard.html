@@ -1,0 +1,65 @@
+{% extends 'accounts/base_dashboard.html' %}
+
+{% block dash %}
+<div class="dash">
+  <div class="project">Student Dashboard</div> 
+</div>
+{% endblock %}
+
+{% block content %}
+
+<div class="action-grid">
+    <a href="{% url 'student_all_notices' %}" class="action-btn">
+        <i class="fa-solid fa-bell"></i>
+        <span>All Notices</span>
+    </a>
+
+    <a href="{% url 'send_report' %}" class="action-btn">
+        <i class="fa-solid fa-file-circle-exclamation"></i>
+        <span>Send Report</span>
+    </a>
+
+    <a href="{% url 'student_documents' %}" class="action-btn">
+        <i class="fa-solid fa-file-lines"></i>
+        <span>Documents</span>
+    </a>
+
+    <a href="{% url 'submit_assignment' %}" class="action-btn">
+        <i class="fa-solid fa-upload"></i>
+        <span>Submit Assignment</span>
+    </a>
+
+    <a href="{% url 'student_class_routine' %}" class="action-btn">
+        <i class="fa-solid fa-calendar-week"></i>
+        <span>Routine View</span>
+    </a>
+</div>
+
+{% endblock %}
+
+{% block notice%}
+<div>
+    <div class="notice-board">
+        <h2><i class="fa-solid fa-bullhorn"></i> Notice Board</h2>
+
+        {% for notice in notices|slice:":2" %}
+        <div class="notice">
+            <strong>{{ notice.title }}</strong>
+            <p>{{ notice.description }}</p>
+            <small>
+                <i class="fa-regular fa-clock"></i> {{ notice.created_at|date:"M d, Y h:i A" }}
+                &nbsp;•&nbsp; {{ notice.created_by.username }}
+                &nbsp;•&nbsp; 
+                {% if notice.notice_type == 'department' %}
+                    <span style="color: #60a5fa;">Department</span>
+                {% else %}
+                    <span style="color: #60a5fa;">Teacher</span>
+                {% endif %}
+            </small>
+        </div>
+        {% empty %}
+        <p style="color: #94a3b8; font-style: italic;">No new notices at this time.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
