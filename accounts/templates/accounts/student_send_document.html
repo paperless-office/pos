@@ -1,21 +1,324 @@
 {% extends 'accounts/base.html' %}
 
-{% block title %}Send Document to Teacher{% endblock %}
+{% block title %}Send Document{% endblock %}
 
 {% block content %}
-<h2>Send Document to Teacher</h2>
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <label>Choose File:</label><br>
-    {{ form.file }} <br><br>
+<style>
+    /* --- FORCE DARK THEME --- */
+    body {
+        background-color: #0f172a !important; /* Deep Slate */
+        color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+    }
 
-    <label>Select Teacher:</label><br>
-    {{ form.teacher }} <br><br>
+    /* --- Page Container --- */
+    .page-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 85vh;
+        padding: 2rem 1rem;
+    }
 
-    <button type="submit">Send Document</button>
-</form>
+    /* --- Glass Card --- */
+    .formal-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        width: 100%;
+        max-width: 550px;
+        padding: 2.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        position: relative;
+        overflow: hidden;
+    }
 
-<a href="{% url 'student_documents' %}">⬅ Back</a>
+    /* Top Gradient Accent */
+    .formal-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 4px;
+        background: linear-gradient(90deg, #3b82f6, #0ea5e9);
+    }
+
+    /* --- Header --- */
+    .card-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .header-icon {
+        font-size: 2rem;
+        color: #3b82f6;
+        margin-bottom: 1rem;
+        display: inline-block;
+        padding: 15px;
+        background: rgba(59, 130, 246, 0.1);
+        border-radius: 50%;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+    }
+
+    .card-header h2 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .card-header p {
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    /* --- FORM ELEMENTS --- */
+
+    /* 1. Formal File Input */
+    .file-input-group {
+        margin-bottom: 2rem;
+    }
+    
+    .file-label {
+        display: block;
+        color: #cbd5e1;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Customizing the file input button */
+    input[type="file"] {
+        width: 100%;
+        font-size: 0.9rem;
+        color: #94a3b8;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    input[type="file"]::file-selector-button {
+        background-color: #1e293b;
+        color: #fff;
+        border: 1px solid #475569;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-right: 15px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        transition: 0.2s;
+    }
+
+    input[type="file"]:hover::file-selector-button {
+        background-color: #3b82f6;
+        border-color: #3b82f6;
+    }
+
+    /* 2. Recipient Selection (Clean List) */
+    .recipient-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Hide default radio */
+    .recipient-option input[type="radio"] {
+        display: none;
+    }
+
+    .recipient-label {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid #334155;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: #cbd5e1;
+        font-size: 0.95rem;
+    }
+
+    /* Icons inside label */
+    .recipient-label i {
+        font-size: 1.1rem;
+        color: #64748b;
+        width: 24px;
+        text-align: center;
+        transition: color 0.2s;
+    }
+
+    /* Hover State */
+    .recipient-label:hover {
+        border-color: #475569;
+        background: rgba(30, 41, 59, 0.8);
+    }
+
+    /* Selected State */
+    .recipient-option input[type="radio"]:checked + .recipient-label {
+        border-color: #3b82f6;
+        background: rgba(59, 130, 246, 0.1);
+        color: #fff;
+    }
+
+    .recipient-option input[type="radio"]:checked + .recipient-label i {
+        color: #3b82f6;
+    }
+
+    /* 3. Dropdown */
+    .dropdown-group {
+        margin-bottom: 2rem;
+    }
+
+    .formal-select {
+        width: 100%;
+        background: #0f172a;
+        border: 1px solid #334155;
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .formal-select:focus {
+        border-color: #3b82f6;
+    }
+
+    /* 4. Submit Button */
+    .btn-submit {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Back Button */
+    .btn-back-float {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #1e293b;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        z-index: 100;
+    }
+    .btn-back-float:hover { background: #3b82f6; border-color: #3b82f6; }
+
+</style>
+
+<div class="page-container">
+    <div class="formal-card">
+        
+        <div class="card-header">
+            <div class="header-icon">
+                <i class="fa-solid fa-file-export"></i>
+            </div>
+            <h2>Send Document</h2>
+            <p>Select your file and the target recipients.</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="file-input-group">
+                <label class="file-label">1. Upload File</label>
+                {{ form.file }}
+            </div>
+
+            <div class="file-input-group">
+                <label class="file-label">2. Select Recipient</label>
+                
+                <div class="recipient-group">
+                    
+                    <div class="recipient-option">
+                        <input type="radio" name="target" value="department" id="opt_dept" checked>
+                        <label class="recipient-label" for="opt_dept">
+                            <i class="fa-solid fa-building-columns"></i>
+                            Send to Department
+                        </label>
+                    </div>
+
+                    <div class="recipient-option">
+                        <input type="radio" name="target" value="all_students" id="opt_all">
+                        <label class="recipient-label" for="opt_all">
+                            <i class="fa-solid fa-users"></i>
+                            Send to All Students
+                        </label>
+                    </div>
+
+                    <div class="recipient-option">
+                        <input type="radio" name="target" value="single_student" id="opt_single">
+                        <label class="recipient-label" for="opt_single">
+                            <i class="fa-solid fa-user"></i>
+                            Send to Single Student
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dropdown-group">
+                <label class="file-label" style="text-transform:none; font-size:0.8rem; color:#64748b;">
+                    If "Single Student" is selected:
+                </label>
+                <select name="student" class="formal-select">
+                    <option value="">-- Select Student --</option>
+                    {% for s in students %}
+                        <option value="{{ s.id }}">{{ s.email }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fa-solid fa-paper-plane"></i> Send Now
+            </button>
+        </form>
+
+    </div>
+</div>
+
+<a href="javascript:history.back()" class="btn-back-float">
+    <i class="fa-solid fa-arrow-left"></i> Go Back
+</a>
+
 {% endblock %}
