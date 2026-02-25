@@ -91,7 +91,3 @@ python manage.py runserver
 ## 📝 Conclusion
 
 The **Paperless Office Management System** is a sustainable step toward a smarter campus. By centralizing workflows, we enhance productivity while fostering environmental responsibility at the University of Global Village.
-
----
-
-**Would you like me to generate a set of sample test cases or a User Manual for this system?**
